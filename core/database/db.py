@@ -15,6 +15,13 @@ def create_tables():
     """)
     
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admins (
+        id INTEGER PRIMARY KEY,
+        admin_id INTEGER UNIQUE
+    )            
+    """)
+    
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY,
         name TEXT,
@@ -108,6 +115,19 @@ def add_product_to_basket(user_id: int, product_id):
     conn.close()
     
 
+def remove_product_from_basket(user_id: int, product_id: int):
+    """Функкция для удаления продукта из корзины"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("DELETE FROM basket WHERE user_id = ? and product_id = ?", (user_id, product_id))
+    rows = cursor.fetchall()
+    
+    conn.commit()
+    conn.close()
+    
+
 def clear_basket(user_id: int):
     """Функция для очистки корзины пользователя"""
     
@@ -119,3 +139,51 @@ def clear_basket(user_id: int):
     
     conn.commit()
     conn.close()
+    
+
+def adding_one(user_id: int, product_id: int):
+    """Функция для увеличения количества товара в корзине"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE basket SET count = count + 1 WHERE product_id = ? and user_id = ?",
+                   (product_id, user_id))
+    rows = cursor.fetchall()
+    
+    conn.commit()
+    conn.close()
+    
+
+
+def subtraction_one(user_id: int, product_id: int):
+    """Функция для уменьшения количества товара в корзине"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE basket SET count = count - 1 WHERE product_id = ? and user_id = ?",
+                   (product_id, user_id))
+    rows = cursor.fetchall()
+    
+    conn.commit()
+    conn.close()
+
+
+def get_admins():
+    """Функция для получения списка id админов"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT admin_id FROM admins")
+    rows = cursor.fetchall()
+    
+    conn.commit()
+    conn.close()
+    
+    return [item[0] for item in rows]
+
+
+admins = get_admins()
+
