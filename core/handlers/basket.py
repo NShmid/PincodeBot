@@ -144,7 +144,7 @@ async def redo_undo_basket(callback: types.CallbackQuery, bot: Bot, state: FSMCo
             
             basket.remove(basket[current_index])
             await state.update_data(basket=basket, current_index=current_index)
-            await show_basket_item(callback.message, bot, current_index, state, mode="+-1")
+            await show_basket_item(callback.message, bot, current_index, state, mode="move")
             
             await callback.answer("Товар удален из корзины")
             

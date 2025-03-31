@@ -29,7 +29,17 @@ def get_admin_product_feed_keyboard(product_id):
 def get_basket_keyboard(current_index, len_basket, product_id):
     keyboard = []
     
-    if current_index == 0:
+    if len_basket == 1:
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=
+            [
+                [
+                    InlineKeyboardButton(text="-1", callback_data=f"-1_{product_id}"),
+                    InlineKeyboardButton(text="+1", callback_data=f"+1_{product_id}")
+                ]
+            ]
+        )
+    elif current_index == 0 and len_basket > 1:
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=
             [
