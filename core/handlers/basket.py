@@ -1,5 +1,5 @@
 from core.database import db
-from aiogram import Router, types, F
+from aiogram import Router, types, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
 
@@ -14,7 +14,8 @@ basket_router = Router()
 
 
 # Функция для отображения одного товара из корзины
-async def show_basket_item(message: types.Message, current_index: int, state: FSMContext):
+async def show_basket_item(message: types.Message, bot: Bot, current_index: int, state: FSMContext, 
+                           mode="create"):
     data = await state.get_data()
     basket = data.get("basket")
     if not basket:
@@ -39,8 +40,17 @@ async def show_basket_item(message: types.Message, current_index: int, state: FS
     # Сохраняем текущий индекс в состоянии
     await state.update_data(current_index=current_index)
     
-    await message.answer_photo(photo=product_image, caption=caption, parse_mode="HTML",
+    if mode == "create":
+        await message.answer_photo(photo=product_image, caption=caption, parse_mode="HTML",
                          reply_markup=get_basket_keyboard(current_index, len(basket), product_id))
+    elif mode == "move":
+        file = types.InputMediaPhoto(media=product_image, caption=caption, parse_mode="HTML")
+        await bot.edit_message_media(
+            chat_id=message.chat.id,
+            message_id=message.message_id,
+            media=file,
+            reply_markup=get_basket_keyboard(current_index, len(basket), product_id)
+        )
     
     answer = "<b>Содержимое корзины:</b>\n"
     
@@ -59,24 +69,36 @@ async def show_basket_item(message: types.Message, current_index: int, state: FS
     
     answer += f"\nОбщая стоимость: {price} рублей"
     
-    await message.answer(answer, reply_markup=basket_menu, parse_mode="HTML")
+    if mode == "create":
+        m = await message.answer(answer, parse_mode="HTML")
+        await state.update_data(last_basket_msg=m.message_id)
+    elif mode == "+-1":
+        data = await state.get_data()
+        last_basket_msg = data.get("last_basket_msg")
+        await bot.edit_message_text(
+            chat_id=message.chat.id,
+            message_id=last_basket_msg,
+            text=answer,
+            parse_mode="HTML"
+        )
 
 
 # Функция для просмотра корзины из ленты или из главного меню
 @basket_router.message(StateFilter(MainState.view_products, MainState.view_main), F.text.lower() == "корзина")
-async def get_basket(message: types.Message, state: FSMContext):   
+async def get_basket(message: types.Message, bot: Bot, state: FSMContext):   
     user_id = message.from_user.id
     basket = db.get_basket(user_id)
     
     await state.set_state(MainState.view_basket)
     await state.update_data(basket=basket)
     await state.update_data(current_index=0)
-    await show_basket_item(message, 0, state)
+    await message.answer("Загружаю корзину...", reply_markup=basket_menu)
+    await show_basket_item(message, bot, 0, state, mode="create")
     
 
 # Функция для инлайн кнопок в корзине
 @basket_router.callback_query(MainState.view_basket)
-async def redo_undo_basket(callback: types.CallbackQuery, state: FSMContext):
+async def redo_undo_basket(callback: types.CallbackQuery, bot: Bot, state: FSMContext):
     data = await state.get_data()
     current_index = data.get("current_index")
     basket = data.get("basket")
@@ -87,13 +109,13 @@ async def redo_undo_basket(callback: types.CallbackQuery, state: FSMContext):
     if "Далее_" in choice:
         if current_index < len(basket) - 1:
             current_index += 1
-            await show_basket_item(callback.message, current_index, state)
+            await show_basket_item(callback.message, bot, current_index, state, mode="move")
         
         await callback.answer()  # Закрываем callback
     elif "Назад_" in choice:
         if current_index > 0:
             current_index -= 1
-            await show_basket_item(callback.message, current_index, state)
+            await show_basket_item(callback.message, bot, current_index, state, mode="move")
     
         await callback.answer()  # Закрываем callback
     elif "+1_" in choice:
@@ -102,7 +124,7 @@ async def redo_undo_basket(callback: types.CallbackQuery, state: FSMContext):
             db.adding_one(user_id, product_id)
             basket[current_index] = basket[current_index][0], basket[current_index][-1] + 1
             await state.update_data(basket=basket)
-            await show_basket_item(callback.message, current_index, state)
+            await show_basket_item(callback.message, bot, current_index, state, mode="+-1")
             await callback.answer("Количество товара изменено")
         else:
             await callback.answer("Вы не можете больше добавить этот товар")
@@ -112,7 +134,7 @@ async def redo_undo_basket(callback: types.CallbackQuery, state: FSMContext):
             db.subtraction_one(user_id, product_id)
             basket[current_index] = basket[current_index][0], basket[current_index][-1] - 1
             await state.update_data(basket=basket, current_index=current_index)
-            await show_basket_item(callback.message, current_index, state)
+            await show_basket_item(callback.message, bot, current_index, state, mode="+-1")
             
             await callback.answer("Количество товара изменено")
         else:
@@ -122,7 +144,7 @@ async def redo_undo_basket(callback: types.CallbackQuery, state: FSMContext):
             
             basket.remove(basket[current_index])
             await state.update_data(basket=basket, current_index=current_index)
-            await show_basket_item(callback.message, current_index, state)
+            await show_basket_item(callback.message, bot, current_index, state, mode="+-1")
             
             await callback.answer("Товар удален из корзины")
             
