@@ -105,7 +105,7 @@ def add_product_to_basket(user_id: int, product_id):
     conn = sqlite3.connect("PinCode.db")
     cursor = conn.cursor()
     
-    cursor.execute("SELECT * FROM basket WHERE product_id = ?", (product_id,))
+    cursor.execute("SELECT * FROM basket WHERE product_id = ? AND user_id = ?", (product_id, user_id))
     rows = cursor.fetchall()
     if not rows:
         cursor.execute("""INSERT INTO basket (user_id, product_id, count) 
