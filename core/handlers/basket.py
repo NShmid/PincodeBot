@@ -43,7 +43,7 @@ async def show_basket_item(message: types.Message, bot: Bot, current_index: int,
     if mode == "create":
         await message.answer_photo(photo=product_image, caption=caption, parse_mode="HTML",
                          reply_markup=get_basket_keyboard(current_index, len(basket), product_id))
-    elif mode == "move":
+    elif mode in ("move", "delete"):
         file = types.InputMediaPhoto(media=product_image, caption=caption, parse_mode="HTML")
         await bot.edit_message_media(
             chat_id=message.chat.id,
@@ -72,7 +72,7 @@ async def show_basket_item(message: types.Message, bot: Bot, current_index: int,
     if mode == "create":
         m = await message.answer(answer, parse_mode="HTML")
         await state.update_data(last_basket_msg=m.message_id)
-    elif mode == "+-1":
+    elif mode in ("+-1", "delete"):
         data = await state.get_data()
         last_basket_msg = data.get("last_basket_msg")
         await bot.edit_message_text(
@@ -139,12 +139,12 @@ async def redo_undo_basket(callback: types.CallbackQuery, bot: Bot, state: FSMCo
             await callback.answer("Количество товара изменено")
         else:
             db.remove_product_from_basket(user_id, product_id)
-            if current_index == len(basket) - 1:
+            basket.pop(current_index)
+            if current_index == len(basket):
                 current_index -= 1
             
-            basket.remove(basket[current_index])
             await state.update_data(basket=basket, current_index=current_index)
-            await show_basket_item(callback.message, bot, current_index, state, mode="move")
+            await show_basket_item(callback.message, bot, current_index, state, mode="delete")
             
             await callback.answer("Товар удален из корзины")
             
