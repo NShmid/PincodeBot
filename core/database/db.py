@@ -40,6 +40,16 @@ def create_tables():
     )            
     """)
     
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS tokens (
+        id INTEGER PRIMARY KEY,
+        seller_id INTEGER UNIQUE,
+        admin_id INTEGER,
+        token TEXT,
+        is_used BOOL
+    )            
+    """)
+    
     conn.commit()
     conn.close()
 
@@ -187,3 +197,60 @@ def get_admins():
 
 admins = get_admins()
 
+
+def add_token(admin_id: int, token: str):
+    """Функция для добавления токена из ссылки-приглашения"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("""INSERT INTO tokens (admin_id, token, is_used) 
+                   VALUES (?, ?, false)""", (admin_id, token))
+    
+    conn.commit()
+    cursor.close()
+
+
+def is_token_used(token: str):
+    """Функция для проверки актуальности ссылки-приглашения"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT is_used FROM tokens WHERE token = ?", (token,))
+    row = cursor.fetchone()
+    
+    conn.commit()
+    cursor.close()
+    
+    return row[0] if row is not None else True
+
+
+def is_new_seller(seller_id):
+    """Функция для проверки уникальности продавцов"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM tokens WHERE seller_id = ?", (seller_id,))
+    row = cursor.fetchone()
+    
+    conn.commit()
+    cursor.close()
+    
+    return row is None
+
+
+def activate_token(seller_id: int, token: str):
+    """Функция для активации ссылки-приглашения"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "UPDATE tokens SET seller_id = ?, is_used = true WHERE token = ?",
+        (seller_id, token)
+    )
+    
+    conn.commit()
+    cursor.close()

@@ -9,6 +9,9 @@ from aiogram.fsm.strategy import FSMStrategy
 from core.handlers.user_handler import user_router
 from core.handlers.product_feed import product_feed_router
 from core.handlers.basket import basket_router
+from core.handlers.admin_handler import admin_router
+from core.database.db import create_tables
+from core.utils.set_commands import set_commands
 
 
 load_dotenv(find_dotenv())
@@ -17,11 +20,12 @@ bot = Bot(token=os.getenv('TOKEN'))
 
 dp = Dispatcher(fsm_strategy=FSMStrategy.USER_IN_CHAT)
 
-dp.include_routers(product_feed_router, basket_router, user_router)
+dp.include_routers(product_feed_router, basket_router, admin_router, user_router)
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
-    await bot.set_my_commands([types.BotCommand(command='start', description='Запустить бота')])
+    create_tables()
+    await set_commands(bot)
     await dp.start_polling(bot)
     
 

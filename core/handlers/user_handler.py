@@ -12,9 +12,29 @@ user_router = Router()
 
 @user_router.message(Command("start"))
 async def user_start(message: types.Message, state: FSMContext):
-    db.create_tables()
+    args = message.text.split(" ", 1)
+    
+    if len(args) > 1:
+        if not db.is_new_seller(message.from_user.id):
+            await message.answer(
+                "Вы не можете использовать эту ссылку",
+                reply_markup=user_main_menu
+            )
+            return
+            
+        token = args[1]
+        if not db.is_token_used(token):
+            db.activate_token(message.from_user.id, token)
+            await message.answer(
+                "Привет, продавец! Ссылка активирована",
+                reply_markup=user_main_menu
+            )
+        else:
+            await message.answer("Это ссылка недействительна", reply_markup=user_main_menu)
+    else:
+        await message.answer("Привет, покупатель!", reply_markup=user_main_menu)
+    
     await state.set_state(MainState.view_main)
-    await message.answer("Привет! Выбери что тебе нужно", reply_markup=user_main_menu)
      
 
 # Функция для возврата в главное меню
