@@ -195,7 +195,19 @@ def get_admins():
     return [item[0] for item in rows]
 
 
-admins = get_admins()
+def get_sellers():
+    """Функция для получения списка id продавцов"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT seller_id FROM tokens")
+    rows = cursor.fetchall()
+    
+    conn.commit()
+    conn.close()
+    
+    return [item[0] for item in rows]
 
 
 def add_token(admin_id: int, token: str):
@@ -254,3 +266,7 @@ def activate_token(seller_id: int, token: str):
     
     conn.commit()
     cursor.close()
+    
+    
+admins = get_admins()
+sellers = get_sellers()

@@ -15,6 +15,21 @@ user_main_menu = ReplyKeyboardMarkup(
     one_time_keyboard=False
 )
 
+seller_main_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Инструкция"),
+            KeyboardButton(text="Лента товаров")
+        ],
+        [
+            KeyboardButton(text="Корзина"),
+            KeyboardButton(text="Панель продавца")
+        ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)
+
 product_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
@@ -37,6 +52,40 @@ basket_menu = ReplyKeyboardMarkup(
         ],
         [
             KeyboardButton(text="Лента товаров")
+        ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)
+
+seller_panel = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Заявки"),
+            KeyboardButton(text="Добавить товар")
+        ],
+        [
+            KeyboardButton(text="Главное меню"),
+        ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)
+
+orders_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Главное меню"),
+        ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)
+
+add_product_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Главное меню"),
         ]
     ],
     resize_keyboard=True,
