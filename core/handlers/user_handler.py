@@ -49,6 +49,11 @@ async def back_to_main_menu(message: types.Message, state: FSMContext):
     await state.set_state(MainState.view_main)
 
 
+@user_router.message(F.text.lower() == "инструкция")
+async def user_instruction(message: types.Message):
+    await message.answer("Инструкция")
+
+
 @user_router.message()
 async def user_start(message: types.Message):
     await message.answer("Выбери что-нибудь из меню")
