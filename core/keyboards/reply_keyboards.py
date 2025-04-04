@@ -91,3 +91,24 @@ add_product_menu = ReplyKeyboardMarkup(
     resize_keyboard=True,
     one_time_keyboard=False
 )
+
+cancel_delivery = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Отмена"),
+        ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)
+
+confirm_delivery = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Подтвердить"),
+            KeyboardButton(text="Отмена"),
+        ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)
