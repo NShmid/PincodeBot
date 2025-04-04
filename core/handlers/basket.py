@@ -2,12 +2,16 @@ from core.database import db
 from aiogram import Router, types, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
+from aiogram.filters.callback_data import CallbackData
 
 from core.keyboards.reply_keyboards import user_main_menu, basket_menu
-from core.keyboards.inline_keyboards import get_basket_keyboard
+from core.keyboards.inline_keyboards import get_basket_keyboard, get_delivery_time_kb
 from core.keyboards.reply_keyboards import product_menu
 from core.database import db
 from core.utils.main_state import MainState
+
+import aiogram_calendar as ac
+from datetime import datetime, timedelta
 
 
 basket_router = Router()
@@ -149,9 +153,52 @@ async def redo_undo_basket(callback: types.CallbackQuery, bot: Bot, state: FSMCo
             await callback.answer("Товар удален из корзины")
             
 
-# Функция для оформления заказа
+# Функция для выбора даты доставки
 @basket_router.message(MainState.view_basket, F.text.lower() == "оформить заказ")
-async def redo_undo_basket(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-    db.clear_basket(user_id)
-    await message.answer("Заказ оформлен, ожидайте.")
+async def select_data(message: types.Message, state: FSMContext):
+    await message.answer(
+        "Выберите дату доставки",
+        reply_markup=await ac.SimpleCalendar().start_calendar()
+    )
+    await state.set_state(MainState.choose_time_delivery)
+
+
+# Функция для выбора времени доставки
+@basket_router.callback_query(MainState.choose_time_delivery, ac.SimpleCalendarCallback.filter())
+async def process_calendar(callback_query: types.CallbackQuery, callback_data: ac.SimpleCalendarCallback, state: FSMContext):
+    selected, date = await ac.SimpleCalendar().process_selection(callback_query, callback_data)
+    if selected:
+        date_now = datetime.now()
+        date_max = date_now + timedelta(days=60)
+        
+        if date > date_max:
+            await callback_query.message.answer(
+                "Срок доставки должен быть меньше 60 дней.\n"
+                "Пожалуйста, выберите другую дату",
+                reply_markup=await ac.SimpleCalendar().start_calendar()
+            )
+            return
+        elif date <= date_now:
+            await callback_query.message.answer(
+                "Заказ можно оформить только на завтра или позже.\n"
+                "Пожалуйста, выберите другую дату",
+                reply_markup=await ac.SimpleCalendar().start_calendar()
+            )
+            return
+        
+        await callback_query.message.answer(
+            f"Вы выбрали: {date.strftime('%d.%m.%Y')}\n"
+            f"Выберите время доставки",
+            reply_markup=get_delivery_time_kb()
+        )
+        await state.set_state(MainState.confirm_delivery)
+    else:
+        await callback_query.answer("Выберите дату из календаря")
+
+
+# Функция для подтверждения даты и времени доставки
+@basket_router.callback_query(MainState.confirm_delivery)
+async def confirm_delivery(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(
+        text=f"Вы выбрали {callback.data} "
+    )

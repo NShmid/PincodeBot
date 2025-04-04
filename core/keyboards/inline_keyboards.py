@@ -81,3 +81,17 @@ def get_basket_keyboard(current_index, len_basket, product_id):
         )
     
     return keyboard
+
+
+def get_delivery_time_kb():
+    delivery_time_keyboard = InlineKeyboardMarkup(
+        inline_keyboard=
+        [
+            [
+                InlineKeyboardButton(text="с 10 до 13", callback_data=f"с 10 до 13"),
+                InlineKeyboardButton(text="с 15 до 18", callback_data=f"с 15 до 18")
+            ]
+        ]
+    )
+    
+    return delivery_time_keyboard
