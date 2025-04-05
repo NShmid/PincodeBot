@@ -36,6 +36,9 @@ def get_basket_keyboard(current_index, len_basket, product_id):
                 [
                     InlineKeyboardButton(text="-1", callback_data=f"-1_{product_id}"),
                     InlineKeyboardButton(text="+1", callback_data=f"+1_{product_id}")
+                ],
+                [
+                    InlineKeyboardButton(text="Удалить товар ❌", callback_data=f"Удалить_{product_id}"),
                 ]
             ]
         )
@@ -47,9 +50,12 @@ def get_basket_keyboard(current_index, len_basket, product_id):
                     InlineKeyboardButton(text="-1", callback_data=f"-1_{product_id}"),
                     InlineKeyboardButton(text="+1", callback_data=f"+1_{product_id}")
                 ],
+                                [
+                    InlineKeyboardButton(text="Удалить товар ❌", callback_data=f"Удалить_{product_id}"),
+                ],
                 [
                     InlineKeyboardButton(text="Далее ➡️", callback_data=f"Далее_{product_id}")
-                ]
+                ],
             ]
         )
     elif current_index > 0 and current_index < len_basket - 1:
@@ -60,10 +66,13 @@ def get_basket_keyboard(current_index, len_basket, product_id):
                     InlineKeyboardButton(text="-1", callback_data=f"-1_{product_id}"),
                     InlineKeyboardButton(text="+1", callback_data=f"+1_{product_id}")
                 ],
+                                [
+                    InlineKeyboardButton(text="Удалить товар ❌", callback_data=f"Удалить_{product_id}"),
+                ],
                 [
                     InlineKeyboardButton(text="Назад ⬅️", callback_data=f"Назад_{product_id}"),
                     InlineKeyboardButton(text="Далее ➡️", callback_data=f"Далее_{product_id}")
-                ]
+                ],
             ]
         )
     else:
@@ -75,8 +84,11 @@ def get_basket_keyboard(current_index, len_basket, product_id):
                     InlineKeyboardButton(text="+1", callback_data=f"+1_{product_id}")
                 ],
                 [
+                    InlineKeyboardButton(text="Удалить товар ❌", callback_data=f"Удалить_{product_id}"),
+                ],
+                [
                     InlineKeyboardButton(text="Назад ⬅️", callback_data=f"Назад_{product_id}"),
-                ]
+                ],
             ]
         )
     

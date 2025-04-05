@@ -46,8 +46,9 @@ async def show_basket_item(message: types.Message, bot: Bot, current_index: int,
     await state.update_data(current_index=current_index)
     
     if mode == "create":
-        await message.answer_photo(photo=product_image, caption=caption, parse_mode="HTML",
+        msg = await message.answer_photo(photo=product_image, caption=caption, parse_mode="HTML",
                          reply_markup=get_basket_keyboard(current_index, len(basket), product_id))
+        await state.update_data(last_basket_msg_id=msg.message_id)
     elif mode in ("move", "delete"):
         file = types.InputMediaPhoto(media=product_image, caption=caption, parse_mode="HTML")
         await bot.edit_message_media(
@@ -96,6 +97,17 @@ async def get_basket(message: types.Message, bot: Bot, state: FSMContext):
     basket = db.get_basket(user_id)
     
     await state.set_state(MainState.view_basket)
+    
+    data = await state.get_data()
+    last_basket_msg_id = data.get("last_basket_msg_id")
+    if last_basket_msg_id:
+        await bot.edit_message_reply_markup(
+            chat_id=message.chat.id,
+            message_id=last_basket_msg_id,
+            reply_markup=None
+        )
+        await state.update_data(last_basket_msg_id=None)
+    
     await state.update_data(basket=basket)
     await state.update_data(current_index=0)
     await message.answer("Загружаю корзину...", reply_markup=basket_menu)
@@ -153,7 +165,33 @@ async def redo_undo_basket(callback: types.CallbackQuery, bot: Bot, state: FSMCo
             await show_basket_item(callback.message, bot, current_index, state, mode="delete")
             
             await callback.answer("Товар удален из корзины")
+    elif "Удалить_" in choice:
+        db.remove_product_from_basket(user_id, product_id)
+        basket.pop(current_index)
+        if current_index == len(basket):
+            current_index -= 1
+        
+        await state.update_data(basket=basket, current_index=current_index)
+        await show_basket_item(callback.message, bot, current_index, state, mode="delete")
+        
+        await callback.answer("Товар удален из корзины")
             
+
+@basket_router.message(MainState.view_basket, F.text.func(TextNormalizer("очистить корзину")))
+async def clear_basket(message: types.Message, bot: Bot, state: FSMContext):
+    data = await state.get_data()
+    last_basket_msg_id = data.get("last_basket_msg_id")
+    if last_basket_msg_id:
+        await bot.edit_message_reply_markup(
+            chat_id=message.chat.id,
+            message_id=last_basket_msg_id,
+            reply_markup=None
+        )
+        await state.update_data(last_basket_msg_id=None)
+    
+    db.clear_basket(message.from_user.id)
+    await message.answer("Корзина очищена!")
+
 
 # Функция для выбора даты доставки
 @basket_router.message(MainState.view_basket, F.text.func(TextNormalizer("оформить заказ")))

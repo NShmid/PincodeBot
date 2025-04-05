@@ -51,7 +51,8 @@ basket_menu = ReplyKeyboardMarkup(
             KeyboardButton(text="Оформить заказ ✔️")
         ],
         [
-            KeyboardButton(text="Лента товаров 🛍️")
+            KeyboardButton(text="Лента товаров 🛍️"),
+            KeyboardButton(text="Очистить корзину 🧹")
         ]
     ],
     resize_keyboard=True,
