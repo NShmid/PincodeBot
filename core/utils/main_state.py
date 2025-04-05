@@ -9,3 +9,4 @@ class MainState(StatesGroup):
     view_basket = State()
     choose_time_delivery = State()
     confirm_delivery = State()
+    view_orders = State()

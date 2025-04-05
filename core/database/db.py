@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 
 def create_tables():
@@ -47,6 +48,18 @@ def create_tables():
         admin_id INTEGER,
         token TEXT,
         is_used BOOL
+    )            
+    """)
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS orders  (
+        id INTEGER PRIMARY KEY,
+        order_descr TEXT,
+        user_id INTEGER,
+        seller_id INTEGER,
+        date DATETIME,
+        time TEXT,
+        order_status TEXT
     )            
     """)
     
@@ -266,6 +279,51 @@ def activate_token(seller_id: int, token: str):
     
     conn.commit()
     cursor.close()
+
+
+def add_order(user_id: int, date: datetime, time: str):
+    """Функция для добавления заказа"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    user_basket = get_basket(user_id)
+    if user_basket:
+        descr = ""
+        price = 0
+        for i, x in enumerate(user_basket):
+            product_id, count = x
+            product = get_product(product_id)[0]
+            descr += f"◽ {product[1]} - {count} шт.\n"
+            price += product[-1]
+        else:
+            descr += f"\n<b>💰 Общая стоимость</b> - {price} рублей"
+
+        cursor.execute("""INSERT INTO orders 
+                       (order_descr, user_id, date, time, order_status)
+                       VALUES (?, ?, ?, ?, "Ожидает проверки")""",
+                       (descr, user_id, date, time))
+        
+    conn.commit()
+    cursor.close()
+    
+    
+def get_orders(user_id: int):
+    """Функция для получения заказов пользователя"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "SELECT * FROM orders WHERE user_id = ?",
+        (user_id,)
+    )
+    orders = cursor.fetchall()
+    
+    conn.commit()
+    cursor.close()
+    
+    return orders
     
     
 admins = get_admins()

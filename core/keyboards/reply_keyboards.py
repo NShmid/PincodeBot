@@ -4,11 +4,12 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 user_main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Инструкция ❔"),
+            KeyboardButton(text="Инструкция 📄"),
             KeyboardButton(text="Лента товаров 🛍️")
         ],
         [
-            KeyboardButton(text="Корзина 🛒")
+            KeyboardButton(text="Корзина 🛒"),
+            KeyboardButton(text="Мои заказы 📋")
         ]
     ],
     resize_keyboard=True,
@@ -18,13 +19,16 @@ user_main_menu = ReplyKeyboardMarkup(
 seller_main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Инструкция ❔"),
+            KeyboardButton(text="Инструкция 📄"),
             KeyboardButton(text="Лента товаров 🛍️")
         ],
         [
             KeyboardButton(text="Корзина 🛒"),
-            KeyboardButton(text="Панель продавца ⚙️")
-        ]
+            KeyboardButton(text="Мои заказы 📋"),
+        ],
+        [
+            KeyboardButton(text="Панель продавца ⚙️"),
+        ],
     ],
     resize_keyboard=True,
     one_time_keyboard=False

@@ -196,6 +196,13 @@ async def clear_basket(message: types.Message, bot: Bot, state: FSMContext):
 # Функция для выбора даты доставки
 @basket_router.message(MainState.view_basket, F.text.func(TextNormalizer("оформить заказ")))
 async def select_data(message: types.Message, state: FSMContext):
+    if not db.get_basket(message.from_user.id):
+        await message.answer(
+            "Ваша корзина пуста!\n"
+            "Для оформления заказа добавьте хотя бы один товар в корзину."
+        )
+        return
+    
     calendar = ac.SimpleCalendar(
         cancel_btn="Отмена",
         today_btn="Сегодня"
@@ -278,6 +285,12 @@ async def get_time_delivery(callback: types.CallbackQuery, bot: Bot, state: FSMC
 # Функция для подтверждения даты и времени доставки
 @basket_router.message(MainState.confirm_delivery, F.text.func(TextNormalizer("подтвердить")))
 async def get_confirm_delivery(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    date = data.get("date")
+    time = data.get("time")
+    db.add_order(message.from_user.id, date, time)
+    db.clear_basket(message.from_user.id)
+    
     menu = seller_main_menu if message.from_user.id in db.sellers else user_main_menu
     await message.answer("Заказ успешно оформлен! Ожидайте.", reply_markup=menu)
     await state.set_state(MainState.view_main)
