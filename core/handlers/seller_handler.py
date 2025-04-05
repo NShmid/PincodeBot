@@ -7,27 +7,28 @@ from core.database import db
 from core.utils.main_state import MainState
 from core.utils.seller_state import SellerState
 from core.filters.seller_filter import IsSeller
+from core.filters.emoji_filter import TextNormalizer
 
 
 seller_router = Router()
 
 
 # Функция для перехода в панель продавца
-@seller_router.message(IsSeller(), MainState.view_main, F.text.lower() == "панель продавца")
+@seller_router.message(IsSeller(), MainState.view_main, F.text.func(TextNormalizer("панель продавца")))
 async def get_panel_seller(message: types.Message, state: FSMContext):
     await message.answer("Вы перешли в панель продавца", reply_markup=seller_panel)
     await state.set_state(SellerState.view_seller_main)
     
 
 # Функция для просмотра заявок
-@seller_router.message(SellerState.view_seller_main, F.text.lower() == "заявки")
+@seller_router.message(SellerState.view_seller_main, F.text.func(TextNormalizer("заявки")))
 async def get_orders(message: types.Message, state: FSMContext):
     await message.answer("Вы выбрали заявки", reply_markup=orders_menu)
     await state.set_state(SellerState.view_orders)
     
 
 # Функция для просмотра заявок
-@seller_router.message(SellerState.view_seller_main, F.text.lower() == "добавить товар")
+@seller_router.message(SellerState.view_seller_main, F.text.func(TextNormalizer("добавить товар")))
 async def add_product(message: types.Message, state: FSMContext):
     await message.answer("Вы выбрали добавить товар", reply_markup=add_product_menu)
     await state.set_state(SellerState.set_name_product)

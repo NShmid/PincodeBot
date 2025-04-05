@@ -6,6 +6,7 @@ from core.keyboards.inline_keyboards import get_user_product_feed_keyboard, get_
 from core.keyboards.reply_keyboards import product_menu
 from core.database import db
 from core.utils.main_state import MainState, offset
+from core.filters.emoji_filter import TextNormalizer
 
 
 product_feed_router = Router()
@@ -35,7 +36,8 @@ async def show_products(message: types.Message, products):
 
 
 # Функция для отображения ленты в первый раз
-@product_feed_router.message(StateFilter(MainState.view_main, MainState.view_basket), F.text.lower() == "лента товаров")
+@product_feed_router.message(StateFilter(MainState.view_main, MainState.view_basket),
+                             F.text.func(TextNormalizer("лента товаров")))
 async def get_product_feed(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     offset[user_id] = 0
@@ -56,7 +58,7 @@ async def get_product_feed(message: types.Message, state: FSMContext):
         
         
 # Функция для отображения ленты на кнопку "еще"
-@product_feed_router.message(MainState.view_products, F.text.lower() == "еще товары")
+@product_feed_router.message(MainState.view_products, F.text.func(TextNormalizer("еще товары")))
 async def show_product_feed(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     

@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from core.keyboards.reply_keyboards import user_main_menu, seller_main_menu
 from core.database import db
 from core.utils.main_state import MainState
+from core.filters.emoji_filter import TextNormalizer
 
 
 user_router = Router()
@@ -42,14 +43,14 @@ async def user_start(message: types.Message, state: FSMContext):
      
 
 # Функция для возврата в главное меню
-@user_router.message(StateFilter("*"), F.text.lower() == "главное меню")
+@user_router.message(StateFilter("*"), F.text.func(TextNormalizer("главное меню")))
 async def back_to_main_menu(message: types.Message, state: FSMContext):
     keyboard = seller_main_menu if message.from_user.id in db.sellers else user_main_menu
     await message.answer("Возвращаю в главное меню...", reply_markup=keyboard)
     await state.set_state(MainState.view_main)
 
 
-@user_router.message(F.text.lower() == "инструкция")
+@user_router.message(F.text.func(TextNormalizer("инструкция")))
 async def user_instruction(message: types.Message):
     await message.answer("Инструкция")
 

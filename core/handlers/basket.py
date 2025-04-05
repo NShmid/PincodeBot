@@ -9,6 +9,7 @@ from core.keyboards.inline_keyboards import get_basket_keyboard, get_delivery_ti
 from core.keyboards.reply_keyboards import product_menu, cancel_delivery, confirm_delivery
 from core.database import db
 from core.utils.main_state import MainState
+from core.filters.emoji_filter import TextNormalizer
 
 import aiogram_calendar as ac
 from datetime import datetime, timedelta
@@ -88,7 +89,8 @@ async def show_basket_item(message: types.Message, bot: Bot, current_index: int,
 
 
 # Функция для просмотра корзины из ленты или из главного меню
-@basket_router.message(StateFilter(MainState.view_products, MainState.view_main), F.text.lower() == "корзина")
+@basket_router.message(StateFilter(MainState.view_products, MainState.view_main),
+                       F.text.func(TextNormalizer('корзина')))
 async def get_basket(message: types.Message, bot: Bot, state: FSMContext):   
     user_id = message.from_user.id
     basket = db.get_basket(user_id)
@@ -154,7 +156,7 @@ async def redo_undo_basket(callback: types.CallbackQuery, bot: Bot, state: FSMCo
             
 
 # Функция для выбора даты доставки
-@basket_router.message(MainState.view_basket, F.text.lower() == "оформить заказ")
+@basket_router.message(MainState.view_basket, F.text.func(TextNormalizer("оформить заказ")))
 async def select_data(message: types.Message, state: FSMContext):
     calendar = ac.SimpleCalendar(
         cancel_btn="Отмена",
@@ -216,7 +218,7 @@ async def get_time_delivery(callback: types.CallbackQuery, bot: Bot, state: FSMC
     data = await state.get_data()
     last_delivery_msg = data.get("last_delivery_msg")
     await bot.edit_message_reply_markup(
-        chat_id=callback.message.chat.id    ,
+        chat_id=callback.message.chat.id,
         message_id=last_delivery_msg,
         reply_markup=None
     )
@@ -236,7 +238,7 @@ async def get_time_delivery(callback: types.CallbackQuery, bot: Bot, state: FSMC
     
 
 # Функция для подтверждения даты и времени доставки
-@basket_router.message(MainState.confirm_delivery, F.text.lower() == "подтвердить")
+@basket_router.message(MainState.confirm_delivery, F.text.func(TextNormalizer("подтвердить")))
 async def get_confirm_delivery(message: types.Message, state: FSMContext):
     menu = seller_main_menu if message.from_user.id in db.sellers else user_main_menu
     await message.answer("Заказ успешно оформлен! Ожидайте.", reply_markup=menu)
@@ -244,7 +246,8 @@ async def get_confirm_delivery(message: types.Message, state: FSMContext):
 
 
 # Функция для отмены оформления заказа
-@basket_router.message(StateFilter(MainState.choose_time_delivery, MainState.confirm_delivery), F.text.lower() == "отмена")
+@basket_router.message(StateFilter(MainState.choose_time_delivery, MainState.confirm_delivery),
+                       F.text.func(TextNormalizer("отмена")))
 async def get_cancel_delivery(message: types.Message, state: FSMContext):
     menu = seller_main_menu if message.from_user.id in db.sellers else user_main_menu
     await message.answer("Возвращаю в главное меню...", reply_markup=menu)

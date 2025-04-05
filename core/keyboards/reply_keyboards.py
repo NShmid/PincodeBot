@@ -4,11 +4,11 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 user_main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Инструкция"),
-            KeyboardButton(text="Лента товаров")
+            KeyboardButton(text="Инструкция ❔"),
+            KeyboardButton(text="Лента товаров 🛍️")
         ],
         [
-            KeyboardButton(text="Корзина")
+            KeyboardButton(text="Корзина 🛒")
         ]
     ],
     resize_keyboard=True,
@@ -18,12 +18,12 @@ user_main_menu = ReplyKeyboardMarkup(
 seller_main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Инструкция"),
-            KeyboardButton(text="Лента товаров")
+            KeyboardButton(text="Инструкция ❔"),
+            KeyboardButton(text="Лента товаров 🛍️")
         ],
         [
-            KeyboardButton(text="Корзина"),
-            KeyboardButton(text="Панель продавца")
+            KeyboardButton(text="Корзина 🛒"),
+            KeyboardButton(text="Панель продавца ⚙️")
         ]
     ],
     resize_keyboard=True,
@@ -33,11 +33,11 @@ seller_main_menu = ReplyKeyboardMarkup(
 product_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Еще товары"),
-            KeyboardButton(text="Корзина")
+            KeyboardButton(text="Еще товары 🛍️"),
+            KeyboardButton(text="Корзина 🛒")
         ],
         [
-            KeyboardButton(text="Главное меню"),
+            KeyboardButton(text="Главное меню 🎛️"),
         ]
     ],
     resize_keyboard=True,
@@ -47,11 +47,11 @@ product_menu = ReplyKeyboardMarkup(
 basket_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Главное меню"),
-            KeyboardButton(text="Оформить заказ")
+            KeyboardButton(text="Главное меню 🎛️"),
+            KeyboardButton(text="Оформить заказ ✔️")
         ],
         [
-            KeyboardButton(text="Лента товаров")
+            KeyboardButton(text="Лента товаров 🛍️")
         ]
     ],
     resize_keyboard=True,
@@ -61,11 +61,11 @@ basket_menu = ReplyKeyboardMarkup(
 seller_panel = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Заявки"),
-            KeyboardButton(text="Добавить товар")
+            KeyboardButton(text="Заявки 📝"),
+            KeyboardButton(text="Добавить товар ➕")
         ],
         [
-            KeyboardButton(text="Главное меню"),
+            KeyboardButton(text="Главное меню 🎛️"),
         ]
     ],
     resize_keyboard=True,
@@ -75,7 +75,7 @@ seller_panel = ReplyKeyboardMarkup(
 orders_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Главное меню"),
+            KeyboardButton(text="Главное меню 🎛️"),
         ]
     ],
     resize_keyboard=True,
@@ -85,7 +85,7 @@ orders_menu = ReplyKeyboardMarkup(
 add_product_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Главное меню"),
+            KeyboardButton(text="Главное меню 🎛️"),
         ]
     ],
     resize_keyboard=True,
@@ -95,7 +95,7 @@ add_product_menu = ReplyKeyboardMarkup(
 cancel_delivery = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Отмена"),
+            KeyboardButton(text="Отмена ❌"),
         ]
     ],
     resize_keyboard=True,
@@ -105,8 +105,8 @@ cancel_delivery = ReplyKeyboardMarkup(
 confirm_delivery = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Подтвердить"),
-            KeyboardButton(text="Отмена"),
+            KeyboardButton(text="Подтвердить ✔️"),
+            KeyboardButton(text="Отмена ❌"),
         ]
     ],
     resize_keyboard=True,
