@@ -226,9 +226,9 @@ async def get_time_delivery(callback: types.CallbackQuery, bot: Bot, state: FSMC
     
     data = await state.get_data()
     date = data.get("date")
-    await bot.send_message(
-        chat_id=callback.message.chat.id,
-        text=f"Дата и время доставки: {date.strftime('%d.%m.%Y')}, {callback.data}\nНапишите \'подтвердить\', если верно."
+    await callback.message.answer(
+        text=f"Дата и время доставки: {date.strftime('%d.%m.%Y')}, {callback.data}.",
+        reply_markup=confirm_delivery
     )
        
     await state.update_data(time=callback.data)
@@ -237,7 +237,7 @@ async def get_time_delivery(callback: types.CallbackQuery, bot: Bot, state: FSMC
 
 # Функция для подтверждения даты и времени доставки
 @basket_router.message(MainState.confirm_delivery, F.text.lower() == "подтвердить")
-async def confirm_delivery(message: types.Message, state: FSMContext):
+async def get_confirm_delivery(message: types.Message, state: FSMContext):
     menu = seller_main_menu if message.from_user.id in db.sellers else user_main_menu
     await message.answer("Заказ успешно оформлен! Ожидайте.", reply_markup=menu)
     await state.set_state(MainState.view_main)
