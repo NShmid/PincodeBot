@@ -25,12 +25,6 @@ dp = Dispatcher(fsm_strategy=FSMStrategy.USER_IN_CHAT)
 dp.include_routers(product_feed_router, basket_router, admin_router, seller_router, user_router)
 dp.callback_query.register(get_date_delivery, SimpleCalendarCallback.filter())
 
-# import sqlite3
-# conn = sqlite3.connect("PinCode.db")
-# cursor = conn.cursor()
-# cursor.execute("DELETE FROM orders")
-# cursor.execute("ALTER TABLE orders ADD Pincode TEXT")
-# conn.commit()
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)

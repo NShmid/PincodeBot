@@ -77,7 +77,8 @@ async def show_basket_item(message: types.Message, bot: Bot, current_index: int,
     
     if mode == "create":
         m = await message.answer(answer, parse_mode="HTML")
-        await state.update_data(last_basket_msg=m.message_id)
+        a = m.message_id if len(basket) > 1 else None
+        await state.update_data(last_basket_msg=a)
     elif mode in ("+-1", "delete"):
         data = await state.get_data()
         last_basket_msg = data.get("last_basket_msg")
@@ -172,6 +173,14 @@ async def redo_undo_basket(callback: types.CallbackQuery, bot: Bot, state: FSMCo
             current_index -= 1
         
         await state.update_data(basket=basket, current_index=current_index)
+        if len(basket) == 0:
+            data = await state.get_data()
+            last_basket_msg = data.get("last_basket_msg_id")
+            await bot.edit_message_reply_markup(
+                chat_id=callback.message.chat.id,
+                message_id=last_basket_msg,
+                reply_markup=None
+            )
         await show_basket_item(callback.message, bot, current_index, state, mode="delete")
         
         await callback.answer("Товар удален из корзины")

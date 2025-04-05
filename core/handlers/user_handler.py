@@ -74,14 +74,25 @@ async def show_order_item(message: types.Message, bot: Bot, current_index: int, 
     delivery_time = order[5]
     order_status = order[6]
     
-    text = (f"Заказ №<b>{order_id}</b>\n\n"
-            f"🛒 <b>Содержимое:</b>\n"
-            f"{order_descr}\n\n"
-            f"🕒 <b>Дата и время доставки:</b> {delivery_date.strftime('%d.%m.%Y')} {delivery_time}\n\n"
-            f"<b>🔸 Статус заказа: {order_status}</b>\n\n"
-            f"Заказ {current_index + 1} из {len(orders)}"
-        )
-    
+    pincode = db.get_pincode(order_id)
+    if pincode:        
+        text = (f"Заказ №<b>{order_id}</b>\n\n"
+                f"🛒 <b>Содержимое:</b>\n"
+                f"{order_descr}\n\n"
+                f"🕒 <b>Дата и время доставки:</b> {delivery_date.strftime('%d.%m.%Y')} {delivery_time}\n\n"
+                f"<b>🔸 Статус заказа: {order_status}</b>\n\n"
+                f'<b>ПИН-код</b>: <span class="tg-spoiler">{pincode}</span>\n\n'
+                f"Заказ {current_index + 1} из {len(orders)}"
+            )
+    else:
+        text = (f"Заказ №<b>{order_id}</b>\n\n"
+                f"🛒 <b>Содержимое:</b>\n"
+                f"{order_descr}\n\n"
+                f"🕒 <b>Дата и время доставки:</b> {delivery_date.strftime('%d.%m.%Y')} {delivery_time}\n\n"
+                f"<b>🔸 Статус заказа: {order_status}</b>\n\n"
+                f"Заказ {current_index + 1} из {len(orders)}"
+            )
+        
     # Сохраняем текущий индекс в состоянии
     await state.update_data(current_index=current_index)
     
@@ -92,7 +103,7 @@ async def show_order_item(message: types.Message, bot: Bot, current_index: int, 
             reply_markup=get_user_order_keyboard(current_index, len(orders))
         )
         await state.update_data(last_order_msg_id=msg.message_id)
-    elif mode == "move":
+    elif mode in ("move", "delete"):
         await bot.edit_message_text(
             text=text,
             chat_id=message.chat.id,

@@ -132,6 +132,63 @@ def get_user_order_keyboard(current_index: int, len_orders: int):
     return keyboard
 
 
+def get_seller_order_keyboard(current_index, len_basket, order_id):
+    keyboard = []
+    
+    if len_basket == 1:
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=
+            [
+                [
+                    InlineKeyboardButton(text="Принять", callback_data=f"Принять_{order_id}"),
+                    InlineKeyboardButton(text="Отклонить", callback_data=f"Отклонить_{order_id}")
+                ],
+            ]
+        )
+    elif current_index == 0 and len_basket > 1:
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=
+            [
+                [
+                    InlineKeyboardButton(text="Принять", callback_data=f"Принять_{order_id}"),
+                    InlineKeyboardButton(text="Отклонить", callback_data=f"Отклонить_{order_id}")
+                ],
+                [
+                    InlineKeyboardButton(text="Далее ➡️", callback_data=f"Далее")
+                ],
+            ]
+        )
+    elif current_index > 0 and current_index < len_basket - 1:
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=
+            [
+                [
+                    InlineKeyboardButton(text="Принять", callback_data=f"Принять_{order_id}"),
+                    InlineKeyboardButton(text="Отклонить", callback_data=f"Отклонить_{order_id}")
+                ],
+                [
+                    InlineKeyboardButton(text="Назад ⬅️", callback_data=f"Назад"),
+                    InlineKeyboardButton(text="Далее ➡️", callback_data=f"Далее")
+                ],
+            ]
+        )
+    else:
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=
+            [
+                [
+                    InlineKeyboardButton(text="Принять", callback_data=f"Принять_{order_id}"),
+                    InlineKeyboardButton(text="Отклонить", callback_data=f"Отклонить_{order_id}")
+                ],
+                [
+                    InlineKeyboardButton(text="Назад ⬅️", callback_data=f"Назад"),
+                ],
+            ]
+        )
+    
+    return keyboard
+
+
 def get_delivery_time_kb():
     delivery_time_keyboard = InlineKeyboardMarkup(
         inline_keyboard=

@@ -324,7 +324,61 @@ def get_orders(user_id: int):
     cursor.close()
     
     return orders
+
+
+def get_all_active_orders():
+    """Функция для получения всех заказов"""
     
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM orders WHERE order_status not in ('Одобрен', 'Отклонен')")
+    orders = cursor.fetchall()
+    
+    conn.commit()
+    cursor.close()
+    
+    return orders
+
+
+def approve_order(order_id: int, pincode: str):
+    """Функция для получения одобрения заказов"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE orders SET order_status = 'Одобрен', Pincode = ? WHERE id = ?", (pincode, order_id))
+    
+    conn.commit()
+    cursor.close()
+
+
+def reject_order(order_id: int):
+    """Функция для отклонения заказов"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE orders SET order_status = 'Отклонен' WHERE id = ?", (order_id,))
+    
+    conn.commit()
+    cursor.close()
+
+
+def get_pincode(order_id: int):
+    """Функция для выдачи пин-кода"""
+    
+    conn = sqlite3.connect("PinCode.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT Pincode FROM orders WHERE id = ?", (order_id,))
+    pincode = cursor.fetchall()[0][0]
+    
+    conn.commit()
+    cursor.close()
+
+    return pincode
+ 
     
 admins = get_admins()
 sellers = get_sellers()
