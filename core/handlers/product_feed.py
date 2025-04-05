@@ -8,6 +8,8 @@ from core.database import db
 from core.utils.main_state import MainState, offset
 from core.filters.emoji_filter import TextNormalizer
 
+from asyncio import sleep
+
 
 product_feed_router = Router()
 
@@ -33,6 +35,7 @@ async def show_products(message: types.Message, products):
             keyboard = get_admin_product_feed_keyboard(product_id)
         await message.answer_photo(photo=product_image, caption=caption, parse_mode="HTML",
                                     reply_markup=keyboard)
+        await sleep(0.5)
 
 
 # Функция для отображения ленты в первый раз
