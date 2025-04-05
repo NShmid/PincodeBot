@@ -156,7 +156,7 @@ async def redo_undo_basket(callback: types.CallbackQuery, bot: Bot, state: FSMCo
 # Функция для выбора даты доставки
 @basket_router.message(MainState.view_basket, F.text.lower() == "оформить заказ")
 async def select_data(message: types.Message, state: FSMContext):
-    locale = "ru_RU"  # await ac.get_user_locale(message.from_user)
+    locale = "ru_RU.utf8"  # await ac.get_user_locale(message.from_user)
     calendar = ac.SimpleCalendar(
         locale=locale,
         cancel_btn="Отмена",
@@ -179,7 +179,7 @@ async def select_data(message: types.Message, state: FSMContext):
 async def get_date_delivery(callback_query: types.CallbackQuery, callback_data: ac.SimpleCalendarCallback, state: FSMContext):
     selected, date = await ac.SimpleCalendar().process_selection(callback_query, callback_data)
     if selected:
-        locale =  "ru_RU" # await ac.get_user_locale(callback_query.message.from_user)
+        locale =  "ru_RU.utf8" # await ac.get_user_locale(callback_query.message.from_user)
         calendar = ac.SimpleCalendar(
             locale=locale,
             cancel_btn="Отмена",
